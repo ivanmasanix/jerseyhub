@@ -5,43 +5,63 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>StopSayingSoccer</title>
   <style>
-    :root{
-      --bg:#0b0d10; --card:#13161a; --muted:#2a2f36; --text:#e9edf1; --sub:#b8c0cc; --accent:#3aa75b; --accent-2:#4aa3ff;
-      --shadow:0 10px 25px rgba(0,0,0,.35)
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:linear-gradient(180deg,#0b0d10,#0e1216);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
-    header{position:sticky;top:0;z-index:10;background:rgba(11,13,16,.85);backdrop-filter:blur(8px);border-bottom:1px solid #1a1f26}
-    .wrap{max-width:1200px;margin:0 auto;padding:20px}
-    .brand{display:flex;justify-content:center;align-items:center;padding:10px 0}
-    .site-logo{max-height:250px}
-    h1{font-size:20px;margin:0}
-    .toolbar{display:grid;grid-template-columns:1fr 160px 160px;gap:10px;margin-top:14px}
-    .search{position:relative}
-    .search input{width:100%;padding:12px 14px 12px 40px;border-radius:12px;background:#0f1318;border:1px solid #1c2128;color:var(--text)}
-    .search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.7}
-    select, .btn, input[type="number"]{border-radius:10px;border:1px solid #1c2128;background:#0f1318;color:var(--text);padding:10px 12px}
-    .btn{cursor:pointer}
-    main{display:grid;grid-template-columns:260px 1fr;gap:20px}
-    aside{position:sticky;top:84px;align-self:start;background:var(--card);border:1px solid #1c2128;border-radius:16px;padding:14px}
-    aside h3{margin:6px 0 10px;font-size:14px;color:var(--sub);font-weight:600}
-    .filters{display:grid;gap:10px}
-    .row{display:flex;gap:8px;flex-wrap:wrap}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(210px,1fr));gap:16px}
-    .card{background:var(--card);border:1px solid #1c2128;border-radius:16px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
-    .thumb{aspect-ratio:4/3;background:linear-gradient(135deg,#11151a,#0e1318);display:grid;place-items:center}
-    .content{padding:12px}
-    .title{font-weight:700;font-size:16px;margin:0}
-    .sub{color:var(--sub);font-size:13px}
-    .price{margin-top:8px;font-weight:700}
-    .top-info{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
-    .muted{color:var(--sub);font-size:13px}
-    .pill{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px;background:#0f1318;border:1px solid #1c2128}
-    .dot{width:10px;height:10px;border-radius:50%}
-    footer{padding:30px 0;color:#7a8596}
-    @media (max-width: 960px){main{grid-template-columns:1fr} aside{position:static}}
-    @media (max-width: 700px){.toolbar{grid-template-columns:1fr}}
-  </style>
+:root{
+  --bg:#0b0d10; --card:#13161a; --muted:#2a2f36; --text:#e9edf1; --sub:#b8c0cc; --accent:#3aa75b; --accent-2:#4aa3ff;
+  --shadow:0 10px 25px rgba(0,0,0,.35)
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#0b0d10,#0e1216);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
+header{position:sticky;top:0;z-index:10;background:rgba(11,13,16,.85);backdrop-filter:blur(8px);border-bottom:1px solid #1a1f26}
+
+/* обертка шапки */
+header .wrap {
+  max-width:1200px;
+  margin:0 auto;
+  padding:8px 20px; /* уменьшили высоту шапки */
+}
+
+/* логотип по центру */
+.brand {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:0; /* убрали лишние отступы */
+}
+
+/* сам логотип */
+.site-logo {
+  height:80px;  /* размер логотипа */
+  width:auto;   /* сохраняем пропорции */
+}
+
+h1{font-size:20px;margin:0}
+.toolbar{display:grid;grid-template-columns:1fr 160px 160px;gap:10px;margin-top:14px}
+.search{position:relative}
+.search input{width:100%;padding:12px 14px 12px 40px;border-radius:12px;background:#0f1318;border:1px solid #1c2128;color:var(--text)}
+.search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.7}
+select, .btn, input[type="number"]{border-radius:10px;border:1px solid #1c2128;background:#0f1318;color:var(--text);padding:10px 12px}
+.btn{cursor:pointer}
+main{display:grid;grid-template-columns:260px 1fr;gap:20px}
+aside{position:sticky;top:84px;align-self:start;background:var(--card);border:1px solid #1c2128;border-radius:16px;padding:14px}
+aside h3{margin:6px 0 10px;font-size:14px;color:var(--sub);font-weight:600}
+.filters{display:grid;gap:10px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(210px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid #1c2128;border-radius:16px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.thumb{aspect-ratio:4/3;background:linear-gradient(135deg,#11151a,#0e1318);display:grid;place-items:center}
+.content{padding:12px}
+.title{font-weight:700;font-size:16px;margin:0}
+.sub{color:var(--sub);font-size:13px}
+.price{margin-top:8px;font-weight:700}
+.top-info{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
+.muted{color:var(--sub);font-size:13px}
+.pill{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px;background:#0f1318;border:1px solid #1c2128}
+.dot{width:10px;height:10px;border-radius:50%}
+footer{padding:30px 0;color:#7a8596}
+@media (max-width: 960px){main{grid-template-columns:1fr} aside{position:static}}
+@media (max-width: 700px){.toolbar{grid-template-columns:1fr}}
+</style>
+
 </head>
 <body>
   <header>
