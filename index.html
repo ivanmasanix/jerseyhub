@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JerseyHub — каталог футбольных джерси</title>
+  <style>
+    :root{
+      --bg:#0b0d10; --card:#13161a; --muted:#2a2f36; --text:#e9edf1; --sub:#b8c0cc; --accent:#3aa75b; --accent-2:#4aa3ff;
+      --shadow:0 10px 25px rgba(0,0,0,.35)
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:linear-gradient(180deg,#0b0d10,#0e1216);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
+    header{position:sticky;top:0;z-index:10;background:rgba(11,13,16,.85);backdrop-filter:blur(8px);border-bottom:1px solid #1a1f26}
+    .wrap{max-width:1200px;margin:0 auto;padding:20px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:36px;height:36px;border-radius:12px;background:conic-gradient(from 180deg,var(--accent),var(--accent-2));box-shadow:var(--shadow)}
+    h1{font-size:20px;margin:0}
+    .toolbar{display:grid;grid-template-columns:1fr 160px 160px;gap:10px;margin-top:14px}
+    .search{position:relative}
+    .search input{width:100%;padding:12px 14px 12px 40px;border-radius:12px;background:#0f1318;border:1px solid #1c2128;color:var(--text)}
+    .search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.7}
+    select, .btn, input[type="number"]{border-radius:10px;border:1px solid #1c2128;background:#0f1318;color:var(--text);padding:10px 12px}
+    .btn{cursor:pointer}
+    main{display:grid;grid-template-columns:260px 1fr;gap:20px}
+    aside{position:sticky;top:84px;align-self:start;background:var(--card);border:1px solid #1c2128;border-radius:16px;padding:14px}
+    aside h3{margin:6px 0 10px;font-size:14px;color:var(--sub);font-weight:600}
+    .filters{display:grid;gap:10px}
+    .row{display:flex;gap:8px;flex-wrap:wrap}
+    .grid{display:grid;grid-template-columns:repeat( auto-fill, minmax(210px,1fr) );gap:16px}
+    .card{background:var(--card);border:1px solid #1c2128;border-radius:16px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
+    .thumb{aspect-ratio:4/3;background:linear-gradient(135deg,#11151a,#0e1318);display:grid;place-items:center}
+    .badge{position:absolute;margin:10px 0 0 10px;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);padding:4px 8px;border-radius:999px;border:1px solid #1f252d;font-size:12px}
+    .content{padding:12px}
+    .title{font-weight:700;font-size:16px;margin:0}
+    .sub{color:var(--sub);font-size:13px}
+    .price{margin-top:8px;font-weight:700}
+    .top-info{display:flex;justify-content:space-between;align-items:center;margin:8px 0}
+    .muted{color:var(--sub);font-size:13px}
+    .pill{display:inline-flex;gap:6px;align-items:center;padding:6px 10px;border-radius:999px;background:#0f1318;border:1px solid #1c2128}
+    .dot{width:10px;height:10px;border-radius:50%}
+    footer{padding:30px 0;color:#7a8596}
+    @media (max-width: 960px){main{grid-template-columns:1fr} aside{position:static}}
+    @media (max-width: 700px){.toolbar{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <h1>JerseyHub — каталог футбольных джерси</h1>
+      </div>
+      <div class="toolbar">
+        <label class="search" aria-label="Поиск по каталогу">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.2-4.2" stroke="currentColor" stroke-width="1.6"/><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6"/></svg>
+          <input id="q" type="search" placeholder="Поиск: клуб, сезон, игрок..." />
+        </label>
+        <select id="sort">
+          <option value="pop">Сначала популярные</option>
+          <option value="priceAsc">Цена: по возрастанию</option>
+          <option value="priceDesc">Цена: по убыванию</option>
+          <option value="new">Сначала новые сезоны</option>
+        </select>
+        <button id="reset" class="btn">Сбросить фильтры</button>
+      </div>
+      <div class="top-info">
+        <span class="muted">Найдено: <strong id="count">0</strong></span>
+        <span class="pill"><span class="muted">Активный цвет:</span> <span id="activeColorName">—</span> <span class="dot" id="activeColorDot" style="background:transparent;border:1px solid #2b333d"></span></span>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <main>
+      <aside>
+        <div class="filters">
+          <div>
+            <h3>Лига</h3>
+            <div class="row" id="leagueRow"></div>
+          </div>
+          <div>
+            <h3>Клуб</h3>
+            <div class="row" id="clubRow"></div>
+          </div>
+          <div>
+            <h3>Сезон</h3>
+            <div class="row" id="seasonRow"></div>
+          </div>
+          <div>
+            <h3>Цвет</h3>
+            <div class="row" id="colorRow"></div>
+          </div>
+          <div>
+            <h3>Цена (€)</h3>
+            <div class="row">
+              <input type="number" id="minPrice" placeholder="Мин" min="0" step="1" style="width:48%"/>
+              <input type="number" id="maxPrice" placeholder="Макс" min="0" step="1" style="width:48%"/>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <section style="min-height:50vh">
+        <div id="grid" class="grid" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <footer>
+      Сделано на чистом HTML/CSS/JS. Чтобы добавить товары, редактируйте массив <code>DATA</code> ниже и загрузите свои изображения в папку <code>images/</code>.
+    </footer>
+  </div>
+
+  <!-- ======= ДАННЫЕ ТОВАРОВ ======= -->
+  <script>
+  const DATA = [
+    {id:"ars-22-home", league:"EPL", club:"Arsenal", season:"2022/23", color:"red",  price:89,  img:"images/arsenal-22-home.jpg", tags:["home","adidas"], pop:9},
+    {id:"bar-23-home", league:"LaLiga", club:"Barcelona", season:"2023/24", color:"blue", price:99,  img:"images/barca-23-home.jpg",    tags:["home","nike"],    pop:10},
+    {id:"rm-21-away", league:"LaLiga", club:"Real Madrid", season:"2021/22", color:"white",price:79,  img:"images/real-21-away.jpg",    tags:["away","adidas"],  pop:7},
+    {id:"juv-20-third", league:"Serie A", club:"Juventus", season:"2020/21", color:"black",price:69,  img:"images/juve-20-third.jpg",    tags:["third","adidas"],  pop:6},
+  ];
+
+  const $ = (sel,root=document)=>root.querySelector(sel);
+  const $$ = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
+
+  const grid = $('#grid');
+  const q = $('#q');
+  const sort = $('#sort');
+  const reset = $('#reset');
+  const leagueRow = $('#leagueRow');
+  const clubRow = $('#clubRow');
+  const seasonRow = $('#seasonRow');
+  const colorRow = $('#colorRow');
+  const minPrice = $('#minPrice');
+  const maxPrice = $('#maxPrice');
+  const countEl = $('#count');
+  const activeColorName = $('#activeColorName');
+  const activeColorDot = $('#activeColorDot');
+
+  const state = { league:null, club:null, season:null, color:null, q:"", min:null, max:null, sort:'pop' };
+
+  function unique(list, key){ return [...new Set(list.map(i=>i[key]))]; }
+
+  function chip(text, active){
+    const b = document.createElement('button');
+    b.className = 'btn';
+    b.textContent = text;
+    b.dataset.value = text;
+    if(active) b.style.outline = `2px solid var(--accent)`;
+    return b;
+  }
+
+  function colorDot(name){
+    const c = document.createElement('button');
+    c.className = 'btn';
+    c.style.display='grid'; c.style.placeItems='center';
+    c.innerHTML = `<span title="${name}" style="width:20px;height:20px;border-radius:50%;border:2px solid #1c2128;background:${name}"></span>`;
+    c.dataset.value = name;
+    return c;
+  }
+
+  function buildFilters(){
+    leagueRow.innerHTML = ''; clubRow.innerHTML=''; seasonRow.innerHTML=''; colorRow.innerHTML='';
+    unique(DATA,'league').sort().forEach(v=>leagueRow.appendChild(chip(v, v===state.league)));
+    unique(DATA,'club').sort().forEach(v=>clubRow.appendChild(chip(v, v===state.club)));
+    unique(DATA,'season').sort().reverse().forEach(v=>seasonRow.appendChild(chip(v, v===state.season)));
+    const colors = unique(DATA,'color');
+    colors.forEach(v=>colorRow.appendChild(colorDot(v)));
+  }
+
+  function apply(){
+    let items = DATA.slice();
+    if(state.q) items = items.filter(i=> (i.club+" "+i.league+" "+i.season+" "+(i.tags||[]).join(' ')).toLowerCase().includes(state.q.toLowerCase()));
+    if(state.league) items = items.filter(i=>i.league===state.league);
+    if(state.club) items = items.filter(i=>i.club===state.club);
+    if(state.season) items = items.filter(i=>i.season===state.season);
+    if(state.color) items = items.filter(i=>i.color===state.color);
+    if(state.min!=null) items = items.filter(i=>i.price>=state.min);
+    if(state.max!=null) items = items.filter(i=>i.price<=state.max);
+
+    if(state.sort==='priceAsc') items.sort((a,b)=>a.price-b.price);
+    else if(state.sort==='priceDesc') items.sort((a,b)=>b.price-a.price);
+    else if(state.sort==='new') items.sort((a,b)=> (b.season.localeCompare(a.season)) );
+    else items.sort((a,b)=>b.pop-a.pop);
+
+    countEl.textContent = items.length;
+    render(items);
+  }
+
+  function card(item){
+    const el = document.createElement('article');
+    el.className = 'card';
+    el.innerHTML = `
+      <div class="thumb" style="position:relative">
+        <span class="badge">${item.season}</span>
+        <img alt="${item.club} ${item.season}" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\'><rect width=\'100%\' height=\'100%\' fill=\'%2311141a\'/><text x=\'50%\' y=\'50%\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%235d6b7a\' font-family=\'sans-serif\'>Нет изображения</text></svg>'" src="${item.img}" style="width:100%;height:100%;object-fit:cover"/>
+      </div>
+      <div class="content">
+        <p class="title">${item.club}</p>
+        <p class="sub">${item.league} · ${item.tags?.join(' · ')||''}</p>
+        <div class="price">€${item.price}</div>
+      </div>`;
+    return el;
+  }
+
+  function render(items){
+    grid.innerHTML = '';
+    items.forEach(i=>grid.appendChild(card(i)));
+  }
+
+  // listeners
+  q.addEventListener('input', ()=>{state.q=q.value; apply();});
+  sort.addEventListener('change', ()=>{state.sort=sort.value; apply();});
+  reset.addEventListener('click', ()=>{Object.assign(state,{league:null,club:null,season:null,color:null,q:'',min:null,max:null,sort:'pop'}); q.value=''; minPrice.value=''; maxPrice.value=''; activeColorName.textContent='—'; activeColorDot.style.background='transparent'; activeColorDot.style.border='1px solid #2b333d'; buildFilters(); apply();});
+
+  leagueRow.addEventListener('click', e=>{ if(e.target.closest('button')){ state.league = e.target.closest('button').dataset.value; buildFilters(); apply(); }});
+  clubRow.addEventListener('click', e=>{ if(e.target.closest('button')){ state.club = e.target.closest('button').dataset.value; buildFilters(); apply(); }});
+  seasonRow.addEventListener('click', e=>{ if(e.target.closest('button')){ state.season = e.target.closest('button').dataset.value; buildFilters(); apply(); }});
+  colorRow.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b){ state.color = b.dataset.value; activeColorName.textContent = state.color; activeColorDot.style.background = state.color; activeColorDot.style.border='none'; apply(); }});
+  minPrice.addEventListener('input', ()=>{state.min = minPrice.value? Number(minPrice.value): null; apply();});
+  maxPrice.addEventListener('input', ()=>{state.max = maxPrice.value? Number(maxPrice.value): null; apply();});
+
+  buildFilters();
+  apply();
+  </script>
+</body>
+</html>
