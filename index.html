@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>StopSayingSoccer</title>
+  <title>JerseyHub — каталог футбольных джерси</title>
   <style>
     :root{
       --bg:#0b0d10; --card:#13161a; --muted:#2a2f36; --text:#e9edf1; --sub:#b8c0cc; --accent:#3aa75b; --accent-2:#4aa3ff;
@@ -13,8 +13,8 @@
     body{margin:0;background:linear-gradient(180deg,#0b0d10,#0e1216);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif}
     header{position:sticky;top:0;z-index:10;background:rgba(11,13,16,.85);backdrop-filter:blur(8px);border-bottom:1px solid #1a1f26}
     .wrap{max-width:1200px;margin:0 auto;padding:20px}
-    .brand{display:flex;align-items:center;gap:12px}
-    .logo{width:36px;height:36px;border-radius:12px;background:conic-gradient(from 180deg,var(--accent),var(--accent-2));box-shadow:var(--shadow)}
+    .brand{display:flex;justify-content:center;align-items:center;padding:10px 0}
+    .site-logo{max-height:60px}
     h1{font-size:20px;margin:0}
     .toolbar{display:grid;grid-template-columns:1fr 160px 160px;gap:10px;margin-top:14px}
     .search{position:relative}
@@ -27,10 +27,9 @@
     aside h3{margin:6px 0 10px;font-size:14px;color:var(--sub);font-weight:600}
     .filters{display:grid;gap:10px}
     .row{display:flex;gap:8px;flex-wrap:wrap}
-    .grid{display:grid;grid-template-columns:repeat( auto-fill, minmax(210px,1fr) );gap:16px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(210px,1fr));gap:16px}
     .card{background:var(--card);border:1px solid #1c2128;border-radius:16px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
     .thumb{aspect-ratio:4/3;background:linear-gradient(135deg,#11151a,#0e1318);display:grid;place-items:center}
-    .badge{position:absolute;margin:10px 0 0 10px;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);padding:4px 8px;border-radius:999px;border:1px solid #1f252d;font-size:12px}
     .content{padding:12px}
     .title{font-weight:700;font-size:16px;margin:0}
     .sub{color:var(--sub);font-size:13px}
@@ -48,8 +47,7 @@
   <header>
     <div class="wrap">
       <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
-        <h1>JerseyHub — каталог футбольных джерси</h1>
+        <img src="images/LogoSSS.png" alt="Логотип JerseyHub" class="site-logo">
       </div>
       <div class="toolbar">
         <label class="search" aria-label="Поиск по каталогу">
@@ -75,24 +73,12 @@
     <main>
       <aside>
         <div class="filters">
+          <div><h3>Лига</h3><div class="row" id="leagueRow"></div></div>
+          <div><h3>Клуб</h3><div class="row" id="clubRow"></div></div>
+          <div><h3>Сезон</h3><div class="row" id="seasonRow"></div></div>
+          <div><h3>Цвет</h3><div class="row" id="colorRow"></div></div>
           <div>
-            <h3>Лига</h3>
-            <div class="row" id="leagueRow"></div>
-          </div>
-          <div>
-            <h3>Клуб</h3>
-            <div class="row" id="clubRow"></div>
-          </div>
-          <div>
-            <h3>Сезон</h3>
-            <div class="row" id="seasonRow"></div>
-          </div>
-          <div>
-            <h3>Цвет</h3>
-            <div class="row" id="colorRow"></div>
-          </div>
-          <div>
-            <h3>Цена (€)</h3>
+            <h3>Цена (₽)</h3>
             <div class="row">
               <input type="number" id="minPrice" placeholder="Мин" min="0" step="1" style="width:48%"/>
               <input type="number" id="maxPrice" placeholder="Макс" min="0" step="1" style="width:48%"/>
@@ -112,137 +98,137 @@
   </div>
 
   <!-- ======= ДАННЫЕ ТОВАРОВ ======= -->
-<script>
-const DATA = [
-  {
-    id: "eng-00-home",
-    league: "International",
-    club: "England",
-    season: "2000-10",
-    color: "white",
-    price: 7500, 
-    img: "images/england.jpg",
-    tags: ["home","umbro"],
-    pop: 10,
-    desc: "Домашняя форма Англии сезона 2000/01."
+  <script>
+  const DATA = [
+    {
+      id: "eng-00-home",
+      league: "International",
+      club: "England",
+      season: "2000-10",
+      color: "white",
+      price: 7500,
+      img: "images/England.jpg",
+      tags: ["home","umbro"],
+      pop: 10,
+      desc: "Домашняя форма Англии сезона 2000/01."
+    }
+  ];
+
+  const $ = (sel,root=document)=>root.querySelector(sel);
+  const $$ = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
+
+  const grid = $('#grid');
+  const q = $('#q');
+  const sort = $('#sort');
+  const reset = $('#reset');
+  const leagueRow = $('#leagueRow');
+  const clubRow = $('#clubRow');
+  const seasonRow = $('#seasonRow');
+  const colorRow = $('#colorRow');
+  const minPrice = $('#minPrice');
+  const maxPrice = $('#maxPrice');
+  const countEl = $('#count');
+  const activeColorName = $('#activeColorName');
+  const activeColorDot = $('#activeColorDot');
+
+  const state = { league:null, club:null, season:null, color:null, q:"", min:null, max:null, sort:'pop' };
+
+  function unique(list, key){ return [...new Set(list.map(i=>i[key]))]; }
+
+  function chip(text, active){
+    const b = document.createElement('button');
+    b.className = 'btn';
+    b.textContent = text;
+    b.dataset.value = text;
+    if(active) b.style.outline = `2px solid var(--accent)`;
+    return b;
   }
-];
 
-const $ = (sel,root=document)=>root.querySelector(sel);
-const $$ = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
+  function colorDot(name){
+    const c = document.createElement('button');
+    c.className = 'btn';
+    c.style.display='grid'; c.style.placeItems='center';
+    c.innerHTML = `<span title="${name}" style="width:20px;height:20px;border-radius:50%;border:2px solid #1c2128;background:${name}"></span>`;
+    c.dataset.value = name;
+    return c;
+  }
 
-const grid = $('#grid');
-const q = $('#q');
-const sort = $('#sort');
-const reset = $('#reset');
-const leagueRow = $('#leagueRow');
-const clubRow = $('#clubRow');
-const seasonRow = $('#seasonRow');
-const colorRow = $('#colorRow');
-const minPrice = $('#minPrice');
-const maxPrice = $('#maxPrice');
-const countEl = $('#count');
-const activeColorName = $('#activeColorName');
-const activeColorDot = $('#activeColorDot');
+  function buildFilters(){
+    leagueRow.innerHTML = ''; clubRow.innerHTML=''; seasonRow.innerHTML=''; colorRow.innerHTML='';
+    unique(DATA,'league').sort().forEach(v=>leagueRow.appendChild(chip(v, v===state.league)));
+    unique(DATA,'club').sort().forEach(v=>clubRow.appendChild(chip(v, v===state.club)));
+    unique(DATA,'season').sort().reverse().forEach(v=>seasonRow.appendChild(chip(v, v===state.season)));
+    const colors = unique(DATA,'color');
+    colors.forEach(v=>colorRow.appendChild(colorDot(v)));
+  }
 
-const state = { league:null, club:null, season:null, color:null, q:"", min:null, max:null, sort:'pop' };
+  function apply(){
+    let items = DATA.slice();
+    if(state.q) items = items.filter(i=> (i.club+" "+i.league+" "+i.season+" "+(i.tags||[]).join(' ')).toLowerCase().includes(state.q.toLowerCase()));
+    if(state.league) items = items.filter(i=>i.league===state.league);
+    if(state.club) items = items.filter(i=>i.club===state.club);
+    if(state.season) items = items.filter(i=>i.season===state.season);
+    if(state.color) items = items.filter(i=>i.color===state.color);
+    if(state.min!=null) items = items.filter(i=>i.price>=state.min);
+    if(state.max!=null) items = items.filter(i=>i.price<=state.max);
 
-function unique(list, key){ return [...new Set(list.map(i=>i[key]))]; }
+    if(state.sort==='priceAsc') items.sort((a,b)=>a.price-b.price);
+    else if(state.sort==='priceDesc') items.sort((a,b)=>b.price-a.price);
+    else if(state.sort==='new') items.sort((a,b)=> (b.season.localeCompare(a.season)) );
+    else items.sort((a,b)=>b.pop-a.pop);
 
-function chip(text, active){
-  const b = document.createElement('button');
-  b.className = 'btn';
-  b.textContent = text;
-  b.dataset.value = text;
-  if(active) b.style.outline = `2px solid var(--accent)`;
-  return b;
-}
+    countEl.textContent = items.length;
+    render(items);
+  }
 
-function colorDot(name){
-  const c = document.createElement('button');
-  c.className = 'btn';
-  c.style.display='grid'; c.style.placeItems='center';
-  c.innerHTML = `<span title="${name}" style="width:20px;height:20px;border-radius:50%;border:2px solid #1c2128;background:${name}"></span>`;
-  c.dataset.value = name;
-  return c;
-}
-
-function buildFilters(){
-  leagueRow.innerHTML = ''; clubRow.innerHTML=''; seasonRow.innerHTML=''; colorRow.innerHTML='';
-  unique(DATA,'league').sort().forEach(v=>leagueRow.appendChild(chip(v, v===state.league)));
-  unique(DATA,'club').sort().forEach(v=>clubRow.appendChild(chip(v, v===state.club)));
-  unique(DATA,'season').sort().reverse().forEach(v=>seasonRow.appendChild(chip(v, v===state.season)));
-  const colors = unique(DATA,'color');
-  colors.forEach(v=>colorRow.appendChild(colorDot(v)));
-}
-
-function apply(){
-  let items = DATA.slice();
-  if(state.q) items = items.filter(i=> (i.club+" "+i.league+" "+i.season+" "+(i.tags||[]).join(' ')).toLowerCase().includes(state.q.toLowerCase()));
-  if(state.league) items = items.filter(i=>i.league===state.league);
-  if(state.club) items = items.filter(i=>i.club===state.club);
-  if(state.season) items = items.filter(i=>i.season===state.season);
-  if(state.color) items = items.filter(i=>i.color===state.color);
-  if(state.min!=null) items = items.filter(i=>i.price>=state.min);
-  if(state.max!=null) items = items.filter(i=>i.price<=state.max);
-
-  if(state.sort==='priceAsc') items.sort((a,b)=>a.price-b.price);
-  else if(state.sort==='priceDesc') items.sort((a,b)=>b.price-a.price);
-  else if(state.sort==='new') items.sort((a,b)=> (b.season.localeCompare(a.season)) );
-  else items.sort((a,b)=>b.pop-a.pop);
-
-  countEl.textContent = items.length;
-  render(items);
-}
-
-function card(item){
-  const el = document.createElement('article');
-  el.className = 'card';
-  el.innerHTML = `
-    <div class="thumb" style="position:relative">
-      <img alt="${item.club} ${item.season}" 
-           onerror="this.src='data:image/svg+xml,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'400\\' height=\\'300\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%2311141a\\'/><text x=\\'50%\\' y=\\'50%\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' fill=\\'%235d6b7a\\' font-family=\\'sans-serif\\'>Нет изображения</text></svg>'" 
-           src="${item.img}" 
-           style="width:100%;height:100%;object-fit:cover"/>
-    </div>
-    <div class="content">
-      <p class="title">${item.club}</p>
-      <p class="sub">${item.league} · ${item.season} · ${item.tags?.join(' · ')||''}</p>
-      <div class="price">
-        ₽${item.price.toLocaleString('ru-RU')}<br>
-        ≈ €${(item.price/100).toFixed(0)}<br>
-        ≈ $${(item.price/94).toFixed(0)}
+  function card(item){
+    const el = document.createElement('article');
+    el.className = 'card';
+    el.innerHTML = `
+      <div class="thumb" style="position:relative">
+        <img alt="${item.club} ${item.season}" 
+             onerror="this.src='data:image/svg+xml,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'400\\' height=\\'300\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%2311141a\\'/><text x=\\'50%\\' y=\\'50%\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' fill=\\'%235d6b7a\\' font-family=\\'sans-serif\\'>Нет изображения</text></svg>'" 
+             src="${item.img}" 
+             style="width:100%;height:100%;object-fit:cover"/>
       </div>
-    </div>`;
-  return el;
-}
+      <div class="content">
+        <p class="title">${item.club}</p>
+        <p class="sub">${item.league} · ${item.season} · ${item.tags?.join(' · ')||''}</p>
+        <div class="price">
+          ₽${item.price.toLocaleString('ru-RU')}<br>
+          ≈ €${(item.price/100).toFixed(0)}<br>
+          ≈ $${(item.price/94).toFixed(0)}
+        </div>
+      </div>`;
+    return el;
+  }
 
-function render(items){
-  grid.innerHTML = '';
-  items.forEach(i=>grid.appendChild(card(i)));
-}
+  function render(items){
+    grid.innerHTML = '';
+    items.forEach(i=>grid.appendChild(card(i)));
+  }
 
-// listeners
-q.addEventListener('input', ()=>{state.q=q.value; apply();});
-sort.addEventListener('change', ()=>{state.sort=sort.value; apply();});
-reset.addEventListener('click', ()=>{
-  Object.assign(state,{league:null,club:null,season:null,color:null,q:'',min:null,max:null,sort:'pop'});
-  q.value=''; minPrice.value=''; maxPrice.value='';
-  activeColorName.textContent='—'; 
-  activeColorDot.style.background='transparent'; 
-  activeColorDot.style.border='1px solid #2b333d'; 
-  buildFilters(); apply();
-});
+  // listeners
+  q.addEventListener('input', ()=>{state.q=q.value; apply();});
+  sort.addEventListener('change', ()=>{state.sort=sort.value; apply();});
+  reset.addEventListener('click', ()=>{
+    Object.assign(state,{league:null,club:null,season:null,color:null,q:'',min:null,max:null,sort:'pop'});
+    q.value=''; minPrice.value=''; maxPrice.value='';
+    activeColorName.textContent='—'; 
+    activeColorDot.style.background='transparent'; 
+    activeColorDot.style.border='1px solid #2b333d'; 
+    buildFilters(); apply();
+  });
 
-leagueRow.addEventListener('click', e=>{ if(e.target.closest('button')){ state.league = e.target.closest('button').dataset.value; buildFilters(); apply(); }});
-clubRow.addEventListener('click', e=>{ if(e.target.closest('button')){ state.club = e.target.closest('button').dataset.value; buildFilters(); apply(); }});
-seasonRow.addEventListener('click', e=>{ if(e.target.closest('button')){ state.season = e.target.closest('button').dataset.value; buildFilters(); apply(); }});
-colorRow.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b){ state.color = b.dataset.value; activeColorName.textContent = state.color; activeColorDot.style.background = state.color; activeColorDot.style.border='none'; apply(); }});
-minPrice.addEventListener('input', ()=>{state.min = minPrice.value? Number(minPrice.value): null; apply();});
-maxPrice.addEventListener('input', ()=>{state.max = maxPrice.value? Number(maxPrice.value): null; apply();});
+  leagueRow.addEventListener('click', e=>{ if(e.target.closest('button')){ state.league = e.target.closest('button').dataset.value; buildFilters(); apply(); }});
+  clubRow.addEventListener('click', e=>{ if(e.target.closest('button')){ state.club = e.target.closest('button').dataset.value; buildFilters(); apply(); }});
+  seasonRow.addEventListener('click', e=>{ if(e.target.closest('button')){ state.season = e.target.closest('button').dataset.value; buildFilters(); apply(); }});
+  colorRow.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b){ state.color = b.dataset.value; activeColorName.textContent = state.color; activeColorDot.style.background = state.color; activeColorDot.style.border='none'; apply(); }});
+  minPrice.addEventListener('input', ()=>{state.min = minPrice.value? Number(minPrice.value): null; apply();});
+  maxPrice.addEventListener('input', ()=>{state.max = maxPrice.value? Number(maxPrice.value): null; apply();});
 
-buildFilters();
-apply();
-</script>
+  buildFilters();
+  apply();
+  </script>
 </body>
 </html>
