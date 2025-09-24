@@ -112,89 +112,90 @@
   </div>
 
   <!-- ======= ДАННЫЕ ТОВАРОВ ======= -->
-  <script>
-  const DATA = [
-  {id: "England Retro T-shirt",
-  league: "Internation",
-  club: "England",
-  season: "2000-10",
-  color: "White",
-  price: 7500,
-  img: "IMG_0735.jpg",
-  tags: ["home","umbro"],
-  pop: 10,
-  desc: "Домашняя форма Англии сезона 2000/01"},
+<script>
+const DATA = [
+  {
+    id: "eng-00-home",
+    league: "International",
+    club: "England",
+    season: "2000-10",
+    color: "white",
+    price: 7500, // цена в рублях
+    img: "images/IMG_0735.jpg", // путь к картинке
+    tags: ["home","umbro"],
+    pop: 10,
+    desc: "Домашняя форма Англии сезона 2000/01."
+  }
 ];
 
+const $ = (sel,root=document)=>root.querySelector(sel);
+const $$ = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
 
-  const $ = (sel,root=document)=>root.querySelector(sel);
-  const $$ = (sel,root=document)=>Array.from(root.querySelectorAll(sel));
+const grid = $('#grid');
+const q = $('#q');
+const sort = $('#sort');
+const reset = $('#reset');
+const leagueRow = $('#leagueRow');
+const clubRow = $('#clubRow');
+const seasonRow = $('#seasonRow');
+const colorRow = $('#colorRow');
+const minPrice = $('#minPrice');
+const maxPrice = $('#maxPrice');
+const countEl = $('#count');
+const activeColorName = $('#activeColorName');
+const activeColorDot = $('#activeColorDot');
 
-  const grid = $('#grid');
-  const q = $('#q');
-  const sort = $('#sort');
-  const reset = $('#reset');
-  const leagueRow = $('#leagueRow');
-  const clubRow = $('#clubRow');
-  const seasonRow = $('#seasonRow');
-  const colorRow = $('#colorRow');
-  const minPrice = $('#minPrice');
-  const maxPrice = $('#maxPrice');
-  const countEl = $('#count');
-  const activeColorName = $('#activeColorName');
-  const activeColorDot = $('#activeColorDot');
+const state = { league:null, club:null, season:null, color:null, q:"", min:null, max:null, sort:'pop' };
 
-  const state = { league:null, club:null, season:null, color:null, q:"", min:null, max:null, sort:'pop' };
+function unique(list, key){ return [...new Set(list.map(i=>i[key]))]; }
 
-  function unique(list, key){ return [...new Set(list.map(i=>i[key]))]; }
+function chip(text, active){
+  const b = document.createElement('button');
+  b.className = 'btn';
+  b.textContent = text;
+  b.dataset.value = text;
+  if(active) b.style.outline = `2px solid var(--accent)`;
+  return b;
+}
 
-  function chip(text, active){
-    const b = document.createElement('button');
-    b.className = 'btn';
-    b.textContent = text;
-    b.dataset.value = text;
-    if(active) b.style.outline = `2px solid var(--accent)`;
-    return b;
-  }
+function colorDot(name){
+  const c = document.createElement('button');
+  c.className = 'btn';
+  c.style.display='grid'; c.style.placeItems='center';
+  c.innerHTML = `<span title="${name}" style="width:20px;height:20px;border-radius:50%;border:2px solid #1c2128;background:${name}"></span>`;
+  c.dataset.value = name;
+  return c;
+}
 
-  function colorDot(name){
-    const c = document.createElement('button');
-    c.className = 'btn';
-    c.style.display='grid'; c.style.placeItems='center';
-    c.innerHTML = `<span title="${name}" style="width:20px;height:20px;border-radius:50%;border:2px solid #1c2128;background:${name}"></span>`;
-    c.dataset.value = name;
-    return c;
-  }
+function buildFilters(){
+  leagueRow.innerHTML = ''; clubRow.innerHTML=''; seasonRow.innerHTML=''; colorRow.innerHTML='';
+  unique(DATA,'league').sort().forEach(v=>leagueRow.appendChild(chip(v, v===state.league)));
+  unique(DATA,'club').sort().forEach(v=>clubRow.appendChild(chip(v, v===state.club)));
+  unique(DATA,'season').sort().reverse().forEach(v=>seasonRow.appendChild(chip(v, v===state.season)));
+  const colors = unique(DATA,'color');
+  colors.forEach(v=>colorRow.appendChild(colorDot(v)));
+}
 
-  function buildFilters(){
-    leagueRow.innerHTML = ''; clubRow.innerHTML=''; seasonRow.innerHTML=''; colorRow.innerHTML='';
-    unique(DATA,'league').sort().forEach(v=>leagueRow.appendChild(chip(v, v===state.league)));
-    unique(DATA,'club').sort().forEach(v=>clubRow.appendChild(chip(v, v===state.club)));
-    unique(DATA,'season').sort().reverse().forEach(v=>seasonRow.appendChild(chip(v, v===state.season)));
-    const colors = unique(DATA,'color');
-    colors.forEach(v=>colorRow.appendChild(colorDot(v)));
-  }
+function apply(){
+  let items = DATA.slice();
+  if(state.q) items = items.filter(i=> (i.club+" "+i.league+" "+i.season+" "+(i.tags||[]).join(' ')).toLowerCase().includes(state.q.toLowerCase()));
+  if(state.league) items = items.filter(i=>i.league===state.league);
+  if(state.club) items = items.filter(i=>i.club===state.club);
+  if(state.season) items = items.filter(i=>i.season===state.season);
+  if(state.color) items = items.filter(i=>i.color===state.color);
+  if(state.min!=null) items = items.filter(i=>i.price>=state.min);
+  if(state.max!=null) items = items.filter(i=>i.price<=state.max);
 
-  function apply(){
-    let items = DATA.slice();
-    if(state.q) items = items.filter(i=> (i.club+" "+i.league+" "+i.season+" "+(i.tags||[]).join(' ')).toLowerCase().includes(state.q.toLowerCase()));
-    if(state.league) items = items.filter(i=>i.league===state.league);
-    if(state.club) items = items.filter(i=>i.club===state.club);
-    if(state.season) items = items.filter(i=>i.season===state.season);
-    if(state.color) items = items.filter(i=>i.color===state.color);
-    if(state.min!=null) items = items.filter(i=>i.price>=state.min);
-    if(state.max!=null) items = items.filter(i=>i.price<=state.max);
+  if(state.sort==='priceAsc') items.sort((a,b)=>a.price-b.price);
+  else if(state.sort==='priceDesc') items.sort((a,b)=>b.price-a.price);
+  else if(state.sort==='new') items.sort((a,b)=> (b.season.localeCompare(a.season)) );
+  else items.sort((a,b)=>b.pop-a.pop);
 
-    if(state.sort==='priceAsc') items.sort((a,b)=>a.price-b.price);
-    else if(state.sort==='priceDesc') items.sort((a,b)=>b.price-a.price);
-    else if(state.sort==='new') items.sort((a,b)=> (b.season.localeCompare(a.season)) );
-    else items.sort((a,b)=>b.pop-a.pop);
+  countEl.textContent = items.length;
+  render(items);
+}
 
-    countEl.textContent = items.length;
-    render(items);
-  }
-
-  function card(item){function card(item){
+function card(item){
   const el = document.createElement('article');
   el.className = 'card';
   el.innerHTML = `
@@ -207,33 +208,41 @@
     <div class="content">
       <p class="title">${item.club}</p>
       <p class="sub">${item.league} · ${item.season} · ${item.tags?.join(' · ')||''}</p>
-      <div class="price">₽${item.price.toLocaleString('ru-RU')}<br>
+      <div class="price">
+        ₽${item.price.toLocaleString('ru-RU')}<br>
         ≈ €${(item.price/100).toFixed(0)}<br>
-        ≈ $${(item.price/94).toFixed(0)}</div>
+        ≈ $${(item.price/94).toFixed(0)}
+      </div>
     </div>`;
   return el;
 }
+
+function render(items){
+  grid.innerHTML = '';
+  items.forEach(i=>grid.appendChild(card(i)));
 }
 
-  function render(items){
-    grid.innerHTML = '';
-    items.forEach(i=>grid.appendChild(card(i)));
-  }
+// listeners
+q.addEventListener('input', ()=>{state.q=q.value; apply();});
+sort.addEventListener('change', ()=>{state.sort=sort.value; apply();});
+reset.addEventListener('click', ()=>{
+  Object.assign(state,{league:null,club:null,season:null,color:null,q:'',min:null,max:null,sort:'pop'});
+  q.value=''; minPrice.value=''; maxPrice.value='';
+  activeColorName.textContent='—'; 
+  activeColorDot.style.background='transparent'; 
+  activeColorDot.style.border='1px solid #2b333d'; 
+  buildFilters(); apply();
+});
 
-  // listeners
-  q.addEventListener('input', ()=>{state.q=q.value; apply();});
-  sort.addEventListener('change', ()=>{state.sort=sort.value; apply();});
-  reset.addEventListener('click', ()=>{Object.assign(state,{league:null,club:null,season:null,color:null,q:'',min:null,max:null,sort:'pop'}); q.value=''; minPrice.value=''; maxPrice.value=''; activeColorName.textContent='—'; activeColorDot.style.background='transparent'; activeColorDot.style.border='1px solid #2b333d'; buildFilters(); apply();});
+leagueRow.addEventListener('click', e=>{ if(e.target.closest('button')){ state.league = e.target.closest('button').dataset.value; buildFilters(); apply(); }});
+clubRow.addEventListener('click', e=>{ if(e.target.closest('button')){ state.club = e.target.closest('button').dataset.value; buildFilters(); apply(); }});
+seasonRow.addEventListener('click', e=>{ if(e.target.closest('button')){ state.season = e.target.closest('button').dataset.value; buildFilters(); apply(); }});
+colorRow.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b){ state.color = b.dataset.value; activeColorName.textContent = state.color; activeColorDot.style.background = state.color; activeColorDot.style.border='none'; apply(); }});
+minPrice.addEventListener('input', ()=>{state.min = minPrice.value? Number(minPrice.value): null; apply();});
+maxPrice.addEventListener('input', ()=>{state.max = maxPrice.value? Number(maxPrice.value): null; apply();});
 
-  leagueRow.addEventListener('click', e=>{ if(e.target.closest('button')){ state.league = e.target.closest('button').dataset.value; buildFilters(); apply(); }});
-  clubRow.addEventListener('click', e=>{ if(e.target.closest('button')){ state.club = e.target.closest('button').dataset.value; buildFilters(); apply(); }});
-  seasonRow.addEventListener('click', e=>{ if(e.target.closest('button')){ state.season = e.target.closest('button').dataset.value; buildFilters(); apply(); }});
-  colorRow.addEventListener('click', e=>{ const b=e.target.closest('button'); if(b){ state.color = b.dataset.value; activeColorName.textContent = state.color; activeColorDot.style.background = state.color; activeColorDot.style.border='none'; apply(); }});
-  minPrice.addEventListener('input', ()=>{state.min = minPrice.value? Number(minPrice.value): null; apply();});
-  maxPrice.addEventListener('input', ()=>{state.max = maxPrice.value? Number(maxPrice.value): null; apply();});
-
-  buildFilters();
-  apply();
-  </script>
+buildFilters();
+apply();
+</script>
 </body>
 </html>
