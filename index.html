@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>JerseyHub — каталог футбольных джерси</title>
+  <title>StopSayingSoccer</title>
   <style>
     :root{
       --bg:#0b0d10; --card:#13161a; --muted:#2a2f36; --text:#e9edf1; --sub:#b8c0cc; --accent:#3aa75b; --accent-2:#4aa3ff;
@@ -194,15 +194,26 @@
     render(items);
   }
 
-  function card(item){
-    <div class="price">
-  ₽${item.price.toLocaleString('ru-RU')}
-  <br>≈ €${(item.price / 100).toFixed(0)}
-  <br>≈ $${(item.price / 94).toFixed(0)}
-</div>
-
-                    
-  }
+  function card(item){function card(item){
+  const el = document.createElement('article');
+  el.className = 'card';
+  el.innerHTML = `
+    <div class="thumb" style="position:relative">
+      <img alt="${item.club} ${item.season}" 
+           onerror="this.src='data:image/svg+xml,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'400\\' height=\\'300\\'><rect width=\\'100%\\' height=\\'100%\\' fill=\\'%2311141a\\'/><text x=\\'50%\\' y=\\'50%\\' dominant-baseline=\\'middle\\' text-anchor=\\'middle\\' fill=\\'%235d6b7a\\' font-family=\\'sans-serif\\'>Нет изображения</text></svg>'" 
+           src="${item.img}" 
+           style="width:100%;height:100%;object-fit:cover"/>
+    </div>
+    <div class="content">
+      <p class="title">${item.club}</p>
+      <p class="sub">${item.league} · ${item.season} · ${item.tags?.join(' · ')||''}</p>
+      <div class="price">₽${item.price.toLocaleString('ru-RU')}<br>
+        ≈ €${(item.price/100).toFixed(0)}<br>
+        ≈ $${(item.price/94).toFixed(0)}</div>
+    </div>`;
+  return el;
+}
+}
 
   function render(items){
     grid.innerHTML = '';
