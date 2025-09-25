@@ -270,15 +270,17 @@ const modalContent = document.getElementById('modalContent');
 function openModal(item) {
   modalContent.innerHTML = `
     <img src="${item.img}" alt="${item.club}">
-    <h2>${item.club}</h2>
-    <p>${item.league} · ${item.season}</p>
-    <p>${item.desc}</p>
-    <div class="price">
-      ₽${item.price.toLocaleString('ru-RU')}<br>
-      ≈ €${(item.price/100).toFixed(0)}<br>
-      ≈ $${(item.price/94).toFixed(0)}
+    <div class="modal-content">
+      <h2>${item.club}</h2>
+      <p>${item.league} · ${item.season}</p>
+      <p>${item.desc}</p>
+      <div class="price">
+        ₽${item.price.toLocaleString('ru-RU')}<br>
+        ≈ €${(item.price/100).toFixed(0)}<br>
+        ≈ $${(item.price/94).toFixed(0)}
+      </div>
+      <button class="modal-close" onclick="closeModal()">Закрыть</button>
     </div>
-    <button class="modal-close" onclick="closeModal()">Закрыть</button>
   `;
   modalBackdrop.style.display = 'flex';
 }
